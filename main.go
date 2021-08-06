@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,7 +16,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func DockerRun() {
+type RunBody struct {
+	Code string
+}
+
+func DockerRun(file string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -38,7 +43,7 @@ func DockerRun() {
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image:      "python",
-		Cmd:        []string{"python", "hello.py"},
+		Cmd:        []string{"python", file},
 		Tty:        false,
 		WorkingDir: "/usr/src/app",
 	}, &container.HostConfig{
@@ -68,7 +73,7 @@ func DockerRun() {
 	case <-statusCh:
 	}
 
-	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		panic(err)
 	}
@@ -76,10 +81,36 @@ func DockerRun() {
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 }
 
-func YourHandler(w http.ResponseWriter, r *http.Request) {
+func RunHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Testing!\n"))
 
-	DockerRun()
+	// fmt.Printf("headers:\n%s\n", r.Header)
+
+	// Parse body
+	// body, err := ioutil.ReadAll(r.Body)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Printf("body:\n%s\n", string(body))
+	// end parse
+
+	decoder := json.NewDecoder(r.Body)
+	var jsonbody RunBody
+	err := decoder.Decode(&jsonbody)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// fmt.Println("body:" + jsonbody.Code)
+
+	// write file
+	err = os.WriteFile("test.py", []byte(jsonbody.Code), 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	DockerRun("test.py")
 
 	// cmd := exec.Command("docker", "run", "-v \"$PWD\":/usr/src/app -w /usr/src/app python python hello.py")
 	// // cmd := exec.Command("docker", "ps", "-a")
@@ -105,7 +136,7 @@ func main() {
 	// Gorilla Mux
 	r := mux.NewRouter()
 	// Routes consist of a path and a handler function.
-	r.HandleFunc("/", YourHandler)
+	r.HandleFunc("/run", RunHandler).Methods("POST")
 	r.Use(loggingMiddleware)
 
 	// Bind to a port and pass our router in
