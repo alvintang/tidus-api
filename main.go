@@ -1,18 +1,21 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -20,7 +23,7 @@ type RunBody struct {
 	Code string
 }
 
-func DockerRun(file string) {
+func DockerRun(file string) string {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -78,12 +81,25 @@ func DockerRun(file string) {
 		panic(err)
 	}
 
-	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	err = cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	dockerStdOut := new(strings.Builder)
+	dockerStdErr := new(strings.Builder)
+
+	// return buf.String()
+	_, err = stdcopy.StdCopy(dockerStdOut, dockerStdErr, out)
+	if dockerStdErr.String() != "" {
+		fmt.Println(dockerStdErr.String())
+		return dockerStdErr.String()
+	}
+
+	return dockerStdOut.String()
 }
 
 func RunHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Testing!\n"))
-
 	// fmt.Printf("headers:\n%s\n", r.Header)
 
 	// Parse body
@@ -102,31 +118,37 @@ func RunHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	// fmt.Println("body:" + jsonbody.Code)
-
 	// write file
 	err = os.WriteFile("test.py", []byte(jsonbody.Code), 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	DockerRun("test.py")
+	output := DockerRun("test.py")
+	trimmedOutput := bytes.Trim([]byte(output), "\u0000")
 
-	// cmd := exec.Command("docker", "run", "-v \"$PWD\":/usr/src/app -w /usr/src/app python python hello.py")
-	// // cmd := exec.Command("docker", "ps", "-a")
-	// fmt.Printf("output:\n%s\n", cmd.String())
-	// out, err := cmd.Output()
-	// if err != nil {
-	// 	fmt.Println("Error: ", err)
-	// }
+	// w.Write([]byte("Testing!\n"))
+	response := map[string]string{"message": string(trimmedOutput)}
+	w.Header().Set("Content-Type", "application/json") // this
+	json.NewEncoder(w).Encode(response)
+}
 
-	// fmt.Printf("output:\n%s\n", out)
+func TestHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello!\n"))
+}
+
+func InfoHandler(w http.ResponseWriter, r *http.Request) {
+	text := "# hello world!\n## This is a markdown sample\nthis is a sample [link](https://www.google.com)\n"
+	response := map[string]string{"message": string(text)}
+	w.Header().Set("Content-Type", "application/json") // this
+	json.NewEncoder(w).Encode(response)
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Do stuff here
-		log.Println(r.RequestURI)
+		log.Println(r.RequestURI + " " + r.Method)
+
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(w, r)
 	})
@@ -136,8 +158,18 @@ func main() {
 	// Gorilla Mux
 	r := mux.NewRouter()
 	// Routes consist of a path and a handler function.
-	r.HandleFunc("/run", RunHandler).Methods("POST")
+	r.HandleFunc("/", TestHandler)
+	r.HandleFunc("/run", RunHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/info", InfoHandler).Methods("GET", "OPTIONS")
 	r.Use(loggingMiddleware)
+
+	// cors
+	cors := handlers.CORS(
+		handlers.AllowedHeaders([]string{"content-type"}),
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}),
+	)
+	r.Use(cors)
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":8000", r))
