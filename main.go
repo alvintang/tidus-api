@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -138,8 +139,37 @@ func TestHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func InfoHandler(w http.ResponseWriter, r *http.Request) {
-	text := "# hello world!\n## This is a markdown sample\nthis is a sample [link](https://www.google.com)\n"
+	// get info from parameter
+	vars := mux.Vars(r)
+	category := vars["category"]
+	filename := vars["id"]
+
+	if len(vars["id"]) == 1 {
+		filename = "0" + filename
+	}
+
+	filename = "static/" + category + "/" + filename
+
+	if category == "info" {
+		filename += ".md"
+	} else if category == "code" {
+		filename += ".py"
+	}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	text, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	// create response
+	// text := "# hello world!\n## This is a markdown sample\nthis is a sample [link](https://www.google.com)\n"
 	response := map[string]string{"message": string(text)}
+
 	w.Header().Set("Content-Type", "application/json") // this
 	json.NewEncoder(w).Encode(response)
 }
@@ -160,7 +190,7 @@ func main() {
 	// Routes consist of a path and a handler function.
 	r.HandleFunc("/", TestHandler)
 	r.HandleFunc("/run", RunHandler).Methods("POST", "OPTIONS")
-	r.HandleFunc("/info", InfoHandler).Methods("GET", "OPTIONS")
+	r.HandleFunc("/data/{category}/{id:[0-9]+}/", InfoHandler).Methods("GET", "OPTIONS")
 	r.Use(loggingMiddleware)
 
 	// cors
