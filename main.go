@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -100,6 +101,20 @@ func DockerRun(file string) string {
 	return dockerStdOut.String()
 }
 
+func TestHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello!\n"))
+}
+
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	// A very simple health check.
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	// In the future we could report back on the status of our DB, or our cache
+	// (e.g. Redis) by performing a simple PING, and include them in the response.
+	io.WriteString(w, `{"alive": true}`)
+}
+
 func RunHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Printf("headers:\n%s\n", r.Header)
 
@@ -131,11 +146,8 @@ func RunHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Write([]byte("Testing!\n"))
 	response := map[string]string{"message": string(trimmedOutput)}
 	w.Header().Set("Content-Type", "application/json") // this
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
-}
-
-func TestHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello!\n"))
 }
 
 func InfoHandler(w http.ResponseWriter, r *http.Request) {
@@ -158,7 +170,15 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		panic(err)
+		log.Printf("Error opening file: %s, error msg:%s", filename, err)
+		// panic(err)
+		response := map[string]string{"message": string(err.Error())}
+
+		w.Header().Set("Content-Type", "application/json") // this
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(response)
+
+		return
 	}
 
 	text, err := ioutil.ReadAll(file)
@@ -171,6 +191,7 @@ func InfoHandler(w http.ResponseWriter, r *http.Request) {
 	response := map[string]string{"message": string(text)}
 
 	w.Header().Set("Content-Type", "application/json") // this
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -189,6 +210,7 @@ func main() {
 	r := mux.NewRouter()
 	// Routes consist of a path and a handler function.
 	r.HandleFunc("/", TestHandler)
+	r.HandleFunc("/health", HealthCheckHandler)
 	r.HandleFunc("/run", RunHandler).Methods("POST", "OPTIONS")
 	r.HandleFunc("/data/{category}/{id:[0-9]+}/", InfoHandler).Methods("GET", "OPTIONS")
 	r.Use(loggingMiddleware)

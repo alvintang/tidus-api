@@ -15,4 +15,7 @@
 # vendor/
 
 # remove .py test files
-*.py
+/*.py
+
+# mac files
+.DS_Store
