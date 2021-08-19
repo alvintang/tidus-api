@@ -1,7 +1,7 @@
 name: GitHub Actions
 on: [push]
 jobs:
-  Run Go Tests:
+  Run_Go_Test:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
