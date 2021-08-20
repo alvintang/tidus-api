@@ -16,7 +16,6 @@ jobs:
       - run: |
           pwd
           ls
-      - run: go get -v
       - name: Run go test
         run: |
           go test -v
