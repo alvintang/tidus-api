@@ -37,7 +37,7 @@ jobs:
           path: |
             tidus-api
   Deploy_UAT:
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Download go pkg
         uses: actions/download-artifact@v2
