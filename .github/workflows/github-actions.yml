@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  Run_Go_Test:
+  Go_Test_and_Build:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -17,14 +17,31 @@ jobs:
         uses: actions/checkout@v2
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - uses: actions/setup-go@v2
+      - name: Setup go
+        uses: actions/setup-go@v2
         with:
           go-version: '^1.16.x' # The Go version to download (if necessary) and use.
-      - run: go version
-      - run: |
-          pwd
-          ls
+      - name: Check go version
+        run: go version
       - name: Run go test
         run: |
           go test -v
       - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Run go build
+        run: |
+          go build
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: tidus-api-pkg
+          path: |
+            tidus-api
+  Deploy_UAT:
+    runs_on: ubuntu-latest
+    steps:
+      - name: Download go pkg
+        uses: actions/download-artifact@v2
+        with:
+          name: tidus-api-pkg
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v1

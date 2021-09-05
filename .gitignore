@@ -19,3 +19,6 @@
 
 # mac files
 .DS_Store
+
+# exe
+tidus-api
