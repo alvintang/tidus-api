@@ -38,6 +38,7 @@ jobs:
             tidus-api
   deploy_and_uat:
     needs: test_and_build
+    environment: uat
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -63,3 +64,6 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -var env=uat
+      - name: Terraform Apply
+        id: plan
+        run: terraform apply --auto-approve -no-color -var env=uat
