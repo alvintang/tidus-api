@@ -39,6 +39,8 @@ jobs:
   deploy_and_uat:
     needs: test_and_build
     runs-on: ubuntu-latest
+    env:
+      tf_actions_working_dir: terraform
     steps:
       - name: Download go pkg
         uses: actions/download-artifact@v2
@@ -49,9 +51,6 @@ jobs:
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v1
       - name: Change dir
-        run: | 
-          cd terraform/
-          ls
       - name: Terraform Init
         id: init
         run: terraform init
