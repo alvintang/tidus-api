@@ -16,7 +16,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_key_pair" "my_key" {
   key_name   = "my_key"
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = var.ssh_pub_key
 }
 
 resource "aws_security_group" "example" {
