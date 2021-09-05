@@ -7,7 +7,7 @@ on:
     branches:
       - main
 jobs:
-  Go_Test_and_Build:
+  test_and_build:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -36,7 +36,8 @@ jobs:
           name: tidus-api-pkg
           path: |
             tidus-api
-  Deploy_UAT:
+  deploy_and_uat:
+    needs: test_and_build
     runs-on: ubuntu-latest
     steps:
       - name: Download go pkg
