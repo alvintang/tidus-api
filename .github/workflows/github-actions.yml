@@ -64,6 +64,6 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -var env=uat
-      - name: Terraform Apply
-        id: plan
-        run: terraform apply --auto-approve -no-color -var env=uat
+      # - name: Terraform Apply
+      #   id: apply
+      #   run: terraform apply --auto-approve -no-color -var env=uat
