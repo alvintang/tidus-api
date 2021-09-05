@@ -39,6 +39,9 @@ jobs:
   deploy_and_uat:
     needs: test_and_build
     runs-on: ubuntu-latest
+    defaults:
+    run:
+      working-directory: terraform
     steps:
       - name: Download go pkg
         uses: actions/download-artifact@v2
@@ -51,8 +54,6 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        with:
-          tf_actions_working_dir: terraform
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
