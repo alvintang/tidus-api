@@ -79,7 +79,8 @@ jobs:
         id: generate_hosts
         run: | 
           cd terraform
-          terraform output public_ip > ../ansible/hosts
+          echo -e "\t\t" >> ../ansible/hosts
+          terraform output public_ip >> ../ansible/hosts
           cd ..
           sed -ie 's/"//g' ./ansible/hosts
       - name: Output hosts
