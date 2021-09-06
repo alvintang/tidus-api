@@ -73,13 +73,13 @@ jobs:
         working-directory: terraform
       - name: Terraform output
         id: tf_output
-        run: terraform output -raw public_ip
+        run: terraform output -json public_ip | jq -r '.[0]'
         working-directory: terraform
       - name: Generate hosts file
         id: generate_hosts
         run: | 
           cd terraform
-          terraform output -raw public_ip > ../ansible/hosts
+          terraform output -json public_ip | jq -r '.[0]' > ../ansible/hosts
       - name: Output hosts
         run: cat ./ansible/hosts
       - name: Install ansible
