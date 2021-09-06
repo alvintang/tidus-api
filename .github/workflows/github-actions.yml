@@ -53,6 +53,11 @@ jobs:
       #     name: tidus-api-pkg
       - name: Check out repository code
         uses: actions/checkout@v2
+      - name: Setup SSH key
+        run: |
+          echo ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/github_actions
+          chmod 600 ~/.ssh/github_actions
+          ssh-add ~/.ssh/github_actions
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v1
       - name: Terraform Init
@@ -85,13 +90,18 @@ jobs:
           sed -ie 's/"//g' ./ansible/hosts
       - name: Output hosts
         run: cat ./ansible/hosts
-      # - name: Install ansible
-      #   run: pip install ansible
-      # - name: Test Ansible
-      #   run: |
-      #     cat hosts
-      #     ansible all -i hosts -m ping
-      #   working-directory: ansible
+      - name: Install ansible
+        run: pip install ansible
+      - name: Test Ansible
+        run: |
+          cat hosts
+          ansible all -i hosts -m ping
+        working-directory: ansible
+      - name: Test Ansible Playbook
+        run: |
+          cat hosts
+          ansible-playbook -i hosts deploy.yml 
+        working-directory: ansible
   destroy_uat:
     needs: deploy_and_uat
     environment: uat # configured for approval

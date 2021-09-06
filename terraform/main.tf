@@ -26,7 +26,8 @@ resource "aws_security_group" "example" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["112.201.99.175/32"]
+    # cidr_blocks = ["112.201.99.175/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # ALLOW ALL egress

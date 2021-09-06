@@ -1,0 +1,10 @@
+---
+- name: Install golang
+  hosts: all
+  remote_user: ubuntu
+
+  tasks:
+  - name: Install golang from yum
+    ansible.builtin.yum:
+      name: golang
+      state: latest
