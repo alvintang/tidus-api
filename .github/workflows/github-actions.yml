@@ -38,7 +38,7 @@ jobs:
       #       tidus-api
   deploy_and_uat:
     needs: test_and_build
-    # environment: uat # configured for approval
+    environment: uat # configured for approval
     runs-on: ubuntu-latest
     # defaults:
     #   run:
