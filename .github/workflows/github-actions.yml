@@ -73,19 +73,19 @@ jobs:
         working-directory: terraform
       - name: Terraform output
         id: tf_output
-        run: terraform output -json public_ip | jq -r '.[0]'
+        run: terraform output -json public_ip
         working-directory: terraform
-      - name: Generate hosts file
-        id: generate_hosts
-        run: | 
-          cd terraform
-          terraform output -json public_ip | jq -r '.[0]' > ../ansible/hosts
-      - name: Output hosts
-        run: cat ./ansible/hosts
-      - name: Install ansible
-        run: pip install ansible
-      - name: Test Ansible
-        run: ansible all -i ./ansible/hosts -m ping
+      # - name: Generate hosts file
+      #   id: generate_hosts
+      #   run: | 
+      #     cd terraform
+      #     terraform output -json public_ip | jq -r '.[0]' > ../ansible/hosts
+      # - name: Output hosts
+      #   run: cat ./ansible/hosts
+      # - name: Install ansible
+      #   run: pip install ansible
+      # - name: Test Ansible
+      #   run: ansible all -i ./ansible/hosts -m ping
   destroy_uat:
     needs: deploy_and_uat
     environment: uat # configured for approval
