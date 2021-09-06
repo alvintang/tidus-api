@@ -101,7 +101,7 @@ jobs:
       - name: Test Ansible
         run: |
           cat hosts
-          ansible all -i hosts -m ping
+          ansible all -i hosts -m ping --become --become-user ubuntu
         working-directory: ansible
       - name: Test Ansible Playbook
         run: |
