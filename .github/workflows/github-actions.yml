@@ -81,7 +81,7 @@ jobs:
           cd terraform
           terraform output public_ip > ../ansible/hosts
           cd ..
-          sed -ie 'g/"//' ./ansible/hosts
+          sed -ie 's/"//g' ./ansible/hosts
       - name: Output hosts
         run: cat ./ansible/hosts
       # - name: Install ansible
