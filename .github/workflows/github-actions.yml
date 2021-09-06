@@ -100,8 +100,8 @@ jobs:
         run: pip install ansible
       - name: Test Ansible
         run: |
-          cat hosts
-          ansible all -i hosts -m ping --become --become-user ubuntu
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible all -i hosts -m ping -extra-vars "ansible_user=ubuntu"
         working-directory: ansible
       - name: Test Ansible Playbook
         run: |
