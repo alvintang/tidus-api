@@ -1,4 +1,4 @@
-name: GitHub Actions
+name: Test, Build, Deploy App
 on:
   workflow_dispatch:
   push:
@@ -59,7 +59,7 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           mkdir ~/.ssh
-          echo ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/github_actions
+          echo -e ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/github_actions
           cat ~/.ssh/github_actions
           chmod 600 ~/.ssh/github_actions
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
