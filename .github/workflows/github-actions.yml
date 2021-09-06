@@ -85,13 +85,13 @@ jobs:
           sed -ie 's/"//g' ./ansible/hosts
       - name: Output hosts
         run: cat ./ansible/hosts
-      - name: Install ansible
-        run: pip install ansible
-      - name: Test Ansible
-        run: |
-          cat hosts
-          ansible all -i hosts -m ping
-        working-directory: ansible
+      # - name: Install ansible
+      #   run: pip install ansible
+      # - name: Test Ansible
+      #   run: |
+      #     cat hosts
+      #     ansible all -i hosts -m ping
+      #   working-directory: ansible
   destroy_uat:
     needs: deploy_and_uat
     environment: uat # configured for approval
