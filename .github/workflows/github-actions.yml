@@ -1,12 +1,12 @@
 name: Test, Build, Deploy App
 on:
-  workflow_dispatch:
   push:
     branches:
       - dev
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 jobs:
   test_and_build:
     runs-on: ubuntu-latest
