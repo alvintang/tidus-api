@@ -14,95 +14,97 @@ jobs:
       - name: Test Ansible
         run: ansible all -m ping
         
-  # test_and_build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-  #     - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-  #     - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-  #     - name: Check out repository code
-  #       uses: actions/checkout@v2
-  #     - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-  #     - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-  #     - name: Setup go
-  #       uses: actions/setup-go@v2
-  #       with:
-  #         go-version: '^1.16.x' # The Go version to download (if necessary) and use.
-  #     - name: Check go version
-  #       run: go version
-  #     - name: Run go test
-  #       run: |
-  #         go test -v
-  #     - run: echo "🍏 This job's status is ${{ job.status }}."
-  #     - name: Run go build
-  #       run: |
-  #         go build
-  #     - name: Archive build artifacts
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: tidus-api-pkg
-  #         path: |
-  #           tidus-api
-  # deploy_and_uat:
-  #   needs: test_and_build
-  #   environment: uat # configured for approval
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: terraform
-  #   env:
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #   steps:
-  #     - name: Download go pkg
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: tidus-api-pkg
-  #     - name: Check out repository code
-  #       uses: actions/checkout@v2
-  #     - name: Setup terraform
-  #       uses: hashicorp/setup-terraform@v1
-  #     - name: Terraform Init
-  #       id: init
-  #       run: terraform init
-  #     - name: Terraform Validate
-  #       id: validate
-  #       run: terraform validate -no-color
-  #     - name: Terraform Plan
-  #       id: plan
-  #       run: terraform plan -no-color -var="env=uat" -var="ssh_pub_key=${{ secrets.SSH_PUBLIC_KEY }}"
-  #     - name: Terraform Apply
-  #       id: apply
-  #       run: terraform apply --auto-approve -no-color -var="env=uat" -var="ssh_pub_key=${{ secrets.SSH_PUBLIC_KEY }}"
-  #     - name: Generate hosts file
-  #       id: output
-  #       run: |
-  #         echo -e "\t\t" >> ./ansible/hosts
-  #         terraform output public_ip >> ./ansible/hosts
-  #     - name: Output hosts
-  #       run: cat ./ansible/hosts
-  # destroy_uat:
-  #   needs: deploy_and_uat
-  #   environment: uat # configured for approval
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       working-directory: terraform
-  #   env:
-  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #   steps:
-  #     - name: Download go pkg
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: tidus-api-pkg
-  #     - name: Check out repository code
-  #       uses: actions/checkout@v2
-  #     - name: Setup terraform
-  #       uses: hashicorp/setup-terraform@v1
-  #     - name: Terraform Init
-  #       id: init
-  #       run: terraform init
-  #     - name: Terraform Destroy
-  #       id: destroy
-  #       run: terraform destroy --auto-approve -no-color -var="env=uat" -var="ssh_pub_key=${{ secrets.SSH_PUBLIC_KEY }}"
+  test_and_build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      # - name: Check out repository code
+      #   uses: actions/checkout@v2
+      # - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      # - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      # - name: Setup go
+      #   uses: actions/setup-go@v2
+      #   with:
+      #     go-version: '^1.16.x' # The Go version to download (if necessary) and use.
+      # - name: Check go version
+      #   run: go version
+      # - name: Run go test
+      #   run: |
+      #     go test -v
+      # - run: echo "🍏 This job's status is ${{ job.status }}."
+      # - name: Run go build
+      #   run: |
+      #     go build
+      # - name: Archive build artifacts
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: tidus-api-pkg
+      #     path: |
+      #       tidus-api
+  deploy_and_uat:
+    needs: test_and_build
+    environment: uat # configured for approval
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Download go pkg
+        uses: actions/download-artifact@v2
+        with:
+          name: tidus-api-pkg
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      # - name: Terraform Validate
+      #   id: validate
+      #   run: terraform validate -no-color
+      # - name: Terraform Plan
+      #   id: plan
+      #   run: terraform plan -no-color -var="env=uat" -var="ssh_pub_key=${{ secrets.SSH_PUBLIC_KEY }}"
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply --auto-approve -no-color -var="env=uat" -var="ssh_pub_key=${{ secrets.SSH_PUBLIC_KEY }}"
+      - name: Generate hosts file
+        id: output
+        run: terraform output public_ip >> ./ansible/hosts
+      - name: Output hosts
+        run: cat ./ansible/hosts
+      - name: Install ansible
+        run: pip install ansible
+      - name: Test Ansible
+        run: ansible all -i ./ansible/hosts -m ping
+  destroy_uat:
+    needs: deploy_and_uat
+    environment: uat # configured for approval
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Download go pkg
+        uses: actions/download-artifact@v2
+        with:
+          name: tidus-api-pkg
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v1
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      - name: Terraform Destroy
+        id: destroy
+        run: terraform destroy --auto-approve -no-color -var="env=uat" -var="ssh_pub_key=${{ secrets.SSH_PUBLIC_KEY }}"
