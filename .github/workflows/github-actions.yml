@@ -75,7 +75,9 @@ jobs:
         id: output
         run: | 
           cd terraform
-          terraform output public_ip > ../ansible/hosts
+          terraform output public_ip > hosts
+      - name: Copy hosts
+        run: cp terraform/hosts ansible/hosts
       - name: Output hosts
         run: cat ./ansible/hosts
       - name: Install ansible
