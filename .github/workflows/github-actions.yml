@@ -83,7 +83,7 @@ jobs:
           cd ..
           sed -ie 's/^"/\t\t/g' ./ansible/hosts
           sed -ie 's/"$//g' ./ansible/hosts
-          tail -n +2 ./ansible/hosts > ./ansible/hosts
+          sed -i '$ d' ./ansible/hosts
       - name: Output hosts
         run: cat ./ansible/hosts
       - name: Install ansible
