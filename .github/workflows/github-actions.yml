@@ -60,9 +60,9 @@ jobs:
         run: |
           mkdir ~/.ssh
           echo ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/github_actions
+          cat ~/.ssh/github_actions
           chmod 600 ~/.ssh/github_actions
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          cat ~/.ssh/github_actions
           ssh-add ~/.ssh/github_actions
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v1
