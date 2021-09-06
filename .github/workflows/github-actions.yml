@@ -87,7 +87,8 @@ jobs:
       - name: Install ansible
         run: pip install ansible
       - name: Test Ansible
-        run: ansible all -i ./ansible/hosts -m ping
+        run: ansible all -i hosts -m ping
+        working-dir: ansible
   destroy_uat:
     needs: deploy_and_uat
     environment: uat # configured for approval
