@@ -101,7 +101,7 @@ jobs:
       - name: Test Ansible
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible all -i hosts -m ping -extra-vars "ansible_user=ubuntu"
+          ansible all -i hosts -m ping -e "ansible_user=ubuntu"
         working-directory: ansible
       - name: Test Ansible Playbook
         run: |
