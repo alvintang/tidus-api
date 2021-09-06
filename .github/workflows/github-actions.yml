@@ -70,6 +70,8 @@ jobs:
       - name: Generate hosts file
         id: output
         run: terraform output public_ip >> ./ansible/hosts
+      - run: ls
+      - run: ls ./ansible
       - name: Output hosts
         run: cat ./ansible/hosts
       - name: Install ansible
