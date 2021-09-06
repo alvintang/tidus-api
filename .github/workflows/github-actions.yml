@@ -98,16 +98,16 @@ jobs:
         run: cat ./ansible/hosts
       - name: Install ansible
         run: pip install ansible
-      - name: Test Ansible
-        run: |
-          export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible all -i hosts -m ping -e "ansible_user=ubuntu"
-        working-directory: ansible
-      - name: Test Ansible Playbook
-        run: |
-          cat hosts
-          ansible-playbook -i hosts deploy.yml 
-        working-directory: ansible
+      # - name: Test Ansible
+      #   run: |
+      #     export ANSIBLE_HOST_KEY_CHECKING=False
+      #     ansible all -i hosts -m ping -e "ansible_user=ubuntu"
+      #   working-directory: ansible
+      # - name: Test Ansible Playbook
+      #   run: |
+      #     cat hosts
+      #     ansible-playbook -i hosts deploy.yml 
+      #   working-directory: ansible
   destroy_uat:
     needs: deploy_and_uat
     environment: uat # configured for approval
