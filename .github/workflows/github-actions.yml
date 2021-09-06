@@ -59,7 +59,7 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           mkdir ~/.ssh
-          echo -e ${{ secrets.SSH_PRIVATE_KEY }} > ~/.ssh/github_actions
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/github_actions
           cat ~/.ssh/github_actions
           chmod 600 ~/.ssh/github_actions
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
