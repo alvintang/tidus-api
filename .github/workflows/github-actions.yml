@@ -103,10 +103,6 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
-      - name: Download go pkg
-        uses: actions/download-artifact@v2
-        with:
-          name: tidus-api-pkg
       - name: Check out repository code
         uses: actions/checkout@v2
       - name: Setup terraform
