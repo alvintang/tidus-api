@@ -51,7 +51,8 @@ jobs:
       - name: Download go pkg
         uses: actions/download-artifact@v2
         with:
-          name: tidus-api-pkg
+          name: tidus-api
+          path: ~/ansible
       - name: Check out repository code
         uses: actions/checkout@v2
       - name: Setup SSH key
