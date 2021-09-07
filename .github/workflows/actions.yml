@@ -106,7 +106,7 @@ jobs:
       - name: Test Ansible Playbook
         run: |
           cat hosts
-          ansible-playbook -i hosts deploy.yml 
+          ansible-playbook -i hosts deploy.yml -e "ansible_ssh_private_key=~/.ssh/github_actions"
         working-directory: ansible
   # destroy_uat:
   #   needs: deploy_and_uat
