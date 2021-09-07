@@ -11,3 +11,25 @@
     ansible.builtin.apt:
       name: golang
       state: latest
+  - name: Create a directory if it does not exist
+    become: true
+    ansible.builtin.file:
+      path: /etc/tidus/
+      state: directory
+      mode: '0755'
+  - name: Copy pkg with owner and permissions
+    become: true
+    ansible.builtin.copy:
+      src: ~/tidus-api-pkg
+      dest: /etc/tidus/tidus-api
+      owner: ubuntu
+      group: ubuntu
+      mode: '0744'
+  - name: Copy service file with owner and permissions
+    become: true
+    ansible.builtin.copy:
+      src: ~/ansible/tidus.service
+      dest: /etc/systemd/system/tidus.service
+      owner: ubuntu
+      group: ubuntu
+      mode: '0744'
