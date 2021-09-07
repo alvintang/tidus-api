@@ -7,6 +7,7 @@
 
   tasks:
   - name: Install golang from yum
+    become: true
     ansible.builtin.apt:
       name: golang
       state: latest
