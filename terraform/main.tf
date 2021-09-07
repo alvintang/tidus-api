@@ -30,6 +30,14 @@ resource "aws_security_group" "example" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "tcp"
+    # cidr_blocks = ["112.201.99.175/32"]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # ALLOW ALL egress
   egress {
     from_port   = 0
