@@ -20,7 +20,7 @@
   - name: Copy pkg with owner and permissions
     become: true
     ansible.builtin.copy:
-      src: ./tidus-api-pkg
+      src: ../tidus-api
       dest: /etc/tidus/tidus-api
       owner: ubuntu
       group: ubuntu
