@@ -34,7 +34,7 @@ jobs:
       - name: Archive build artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: tidus-api-pkg
+          name: tidus-api
           path: |
             tidus-api
   deploy_and_uat:
@@ -106,7 +106,7 @@ jobs:
       #   working-directory: ansible
       - name: Test Ansible Playbook
         run: |
-          cat hosts
+          ls
           ansible-playbook -i hosts deploy.yml -e "ansible_ssh_private_key_file=~/.ssh/github_actions"
         working-directory: ansible
   # destroy_uat:
