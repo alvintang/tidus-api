@@ -20,7 +20,7 @@
   - name: Copy pkg with owner and permissions
     become: true
     ansible.builtin.copy:
-      src: ./tidus-api
+      src: /tmp/tidus-api
       dest: /etc/tidus/tidus-api
       owner: ubuntu
       group: ubuntu
@@ -28,7 +28,7 @@
   - name: Copy service file with owner and permissions
     become: true
     ansible.builtin.copy:
-      src: ./ansible/tidus.service
+      src: ./tidus.service
       dest: /etc/systemd/system/tidus.service
       owner: ubuntu
       group: ubuntu
